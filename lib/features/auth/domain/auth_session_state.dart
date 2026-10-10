@@ -77,7 +77,14 @@ final class AuthSessionActive extends AuthSessionState {
   );
 
   @override
-  List<Object?> get props => [account.uid, account.isAnonymous, account.email, account.emailVerified, pending, failure];
+  List<Object?> get props => [
+    account.uid,
+    account.isAnonymous,
+    account.email,
+    account.emailVerified,
+    pending,
+    failure,
+  ];
 }
 
 /// No account is signed in.

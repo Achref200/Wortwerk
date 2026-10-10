@@ -56,15 +56,9 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
 
   /// The stream subscription drives snapshots; [AuthSessionStarted] only
   /// marks the lifecycle so callers/tests have a thing to await.
-  void _onStarted(
-    AuthSessionStarted event,
-    Emitter<AuthSessionState> emit,
-  ) {}
+  void _onStarted(AuthSessionStarted event, Emitter<AuthSessionState> emit) {}
 
-  void _onSnapshot(
-    AuthSessionSnapshot event,
-    Emitter<AuthSessionState> emit,
-  ) {
+  void _onSnapshot(AuthSessionSnapshot event, Emitter<AuthSessionState> emit) {
     final account = event.account;
     emit(
       account == null

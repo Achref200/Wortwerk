@@ -4,11 +4,12 @@ import 'package:wortwerk/core/animations/page_transitions.dart';
 
 import 'animation_test_host.dart';
 
-Opacity _transitionOpacity(WidgetTester tester, Type type) => tester.widget<Opacity>(
-  find
-      .descendant(of: find.byType(type), matching: find.byType(Opacity))
-      .first,
-);
+Opacity _transitionOpacity(WidgetTester tester, Type type) =>
+    tester.widget<Opacity>(
+      find
+          .descendant(of: find.byType(type), matching: find.byType(Opacity))
+          .first,
+    );
 
 void main() {
   group('SharedAxisTransition', () {
@@ -155,7 +156,10 @@ void main() {
         settings: const RouteSettings(name: '/next'),
       );
       expect(route.transitionDuration, const Duration(milliseconds: 300));
-      expect(route.reverseTransitionDuration, const Duration(milliseconds: 300));
+      expect(
+        route.reverseTransitionDuration,
+        const Duration(milliseconds: 300),
+      );
       expect(route.axis, SharedAxisAxis.horizontal);
       expect(route.settings.name, '/next');
     });
@@ -163,7 +167,10 @@ void main() {
     test('FadeThroughPage uses the 300 ms transition spec', () {
       final route = FadeThroughPage<void>(child: const SizedBox.shrink());
       expect(route.transitionDuration, const Duration(milliseconds: 300));
-      expect(route.reverseTransitionDuration, const Duration(milliseconds: 300));
+      expect(
+        route.reverseTransitionDuration,
+        const Duration(milliseconds: 300),
+      );
     });
 
     testWidgets('pushing a SharedAxisPage renders the child', (tester) async {
@@ -171,9 +178,9 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) => TextButton(
-              onPressed: () => Navigator.of(
-                context,
-              ).push(SharedAxisPage<void>(child: const Text('detail'))),
+              onPressed: () =>
+                  Navigator.of(context)
+                      .push(SharedAxisPage<void>(child: const Text('detail'))),
               child: const Text('open'),
             ),
           ),

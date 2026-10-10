@@ -184,9 +184,10 @@ final class ConfettiPainter extends CustomPainter {
           origin.dy +
           math.sin(particle.angle) * travel +
           gravity * progress * progress;
-      final paint = Paint()..color = particle.color.withValues(
-        alpha: (1 - progress).clamp(0.0, 1.0),
-      );
+      final paint = Paint()
+        ..color = particle.color.withValues(
+          alpha: (1 - progress).clamp(0.0, 1.0),
+        );
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate(particle.spin * progress);

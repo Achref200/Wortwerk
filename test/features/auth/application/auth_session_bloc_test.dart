@@ -38,7 +38,8 @@ void main() {
 
     test('signs out and reports who did it to the repository', () async {
       final repository = _FakeAuthRepository();
-      final bloc = AuthSessionBloc(repository: repository)..add(const AuthSessionStarted());
+      final bloc = AuthSessionBloc(repository: repository)
+        ..add(const AuthSessionStarted());
       addTearDown(bloc.close);
       addTearDown(repository.dispose);
 
@@ -51,69 +52,88 @@ void main() {
       expect(bloc.state.isPending, isFalse);
     });
 
-    test('keeps the session and surfaces a shared failure when sign-out fails', () async {
-      final repository = _FakeAuthRepository()
-        ..signOutFailure = const AuthFailure(
-          code: 'network-request-failed',
-          message: 'Offline.',
+    test(
+      'keeps the session and surfaces a shared failure when sign-out fails',
+      () async {
+        final repository = _FakeAuthRepository()
+          ..signOutFailure = const AuthFailure(
+            code: 'network-request-failed',
+            message: 'Offline.',
+          );
+        final bloc = AuthSessionBloc(repository: repository)
+          ..add(const AuthSessionStarted());
+        addTearDown(bloc.close);
+        addTearDown(repository.dispose);
+
+        await _waitFor(() => bloc.state is AuthSessionActive);
+        bloc.add(const AuthSessionSignOutRequested());
+        await _waitFor(() => bloc.state.failure != null);
+
+        expect(bloc.state, isA<AuthSessionActive>());
+        expect(bloc.state.failure?.kind, AppFailureKind.network);
+        expect(bloc.state.failure?.retryable, isTrue);
+        expect(bloc.state.isPending, isFalse);
+
+        bloc.add(const AuthSessionFailureDismissed());
+        await _waitFor(() => bloc.state.failure == null);
+        expect(bloc.state, isA<AuthSessionActive>());
+      },
+    );
+
+    test(
+      'sends verification mail and reports it as a one-shot notice',
+      () async {
+        final repository = _FakeAuthRepository(
+          account: _FakeAuthRepository.member,
         );
-      final bloc = AuthSessionBloc(repository: repository)..add(const AuthSessionStarted());
-      addTearDown(bloc.close);
-      addTearDown(repository.dispose);
+        final bloc = AuthSessionBloc(repository: repository)
+          ..add(const AuthSessionStarted());
+        addTearDown(bloc.close);
+        addTearDown(repository.dispose);
 
-      await _waitFor(() => bloc.state is AuthSessionActive);
-      bloc.add(const AuthSessionSignOutRequested());
-      await _waitFor(() => bloc.state.failure != null);
+        await _waitFor(() => bloc.state is AuthSessionActive);
+        final notices = <AuthSessionNotice>[];
+        final subscription = bloc.notices.listen(notices.add);
+        addTearDown(subscription.cancel);
 
-      expect(bloc.state, isA<AuthSessionActive>());
-      expect(bloc.state.failure?.kind, AppFailureKind.network);
-      expect(bloc.state.failure?.retryable, isTrue);
-      expect(bloc.state.isPending, isFalse);
+        bloc.add(const AuthSessionVerificationRequested());
+        await _waitFor(() => repository.verificationCalls == 1);
+        await _waitFor(() => notices.isNotEmpty);
 
-      bloc.add(const AuthSessionFailureDismissed());
-      await _waitFor(() => bloc.state.failure == null);
-      expect(bloc.state, isA<AuthSessionActive>());
-    });
+        expect(notices, [AuthSessionNotice.verificationSent]);
+        expect(bloc.state.isPending, isFalse);
+        expect(bloc.state.failure, isNull);
+      },
+    );
 
-    test('sends verification mail and reports it as a one-shot notice', () async {
-      final repository = _FakeAuthRepository(account: _FakeAuthRepository.member);
-      final bloc = AuthSessionBloc(repository: repository)..add(const AuthSessionStarted());
-      addTearDown(bloc.close);
-      addTearDown(repository.dispose);
+    test(
+      'reload refreshes provider-owned fields such as verification',
+      () async {
+        final repository = _FakeAuthRepository(
+          account: _FakeAuthRepository.member,
+        );
+        final bloc = AuthSessionBloc(repository: repository)
+          ..add(const AuthSessionStarted());
+        addTearDown(bloc.close);
+        addTearDown(repository.dispose);
 
-      await _waitFor(() => bloc.state is AuthSessionActive);
-      final notices = <AuthSessionNotice>[];
-      final subscription = bloc.notices.listen(notices.add);
-      addTearDown(subscription.cancel);
+        await _waitFor(() => bloc.state is AuthSessionActive);
+        expect(bloc.state.account?.emailVerified, isFalse);
 
-      bloc.add(const AuthSessionVerificationRequested());
-      await _waitFor(() => repository.verificationCalls == 1);
-      await _waitFor(() => notices.isNotEmpty);
+        bloc.add(const AuthSessionReloadRequested());
+        await _waitFor(() => bloc.state.account?.emailVerified ?? false);
 
-      expect(notices, [AuthSessionNotice.verificationSent]);
-      expect(bloc.state.isPending, isFalse);
-      expect(bloc.state.failure, isNull);
-    });
-
-    test('reload refreshes provider-owned fields such as verification', () async {
-      final repository = _FakeAuthRepository(account: _FakeAuthRepository.member);
-      final bloc = AuthSessionBloc(repository: repository)..add(const AuthSessionStarted());
-      addTearDown(bloc.close);
-      addTearDown(repository.dispose);
-
-      await _waitFor(() => bloc.state is AuthSessionActive);
-      expect(bloc.state.account?.emailVerified, isFalse);
-
-      bloc.add(const AuthSessionReloadRequested());
-      await _waitFor(() => bloc.state.account?.emailVerified ?? false);
-
-      expect(bloc.state.account?.emailVerified, isTrue);
-      expect(bloc.state.isPending, isFalse);
-    });
+        expect(bloc.state.account?.emailVerified, isTrue);
+        expect(bloc.state.isPending, isFalse);
+      },
+    );
 
     test('deletes with the supplied password and ends the session', () async {
-      final repository = _FakeAuthRepository(account: _FakeAuthRepository.member);
-      final bloc = AuthSessionBloc(repository: repository)..add(const AuthSessionStarted());
+      final repository = _FakeAuthRepository(
+        account: _FakeAuthRepository.member,
+      );
+      final bloc = AuthSessionBloc(repository: repository)
+        ..add(const AuthSessionStarted());
       addTearDown(bloc.close);
       addTearDown(repository.dispose);
 
@@ -126,12 +146,14 @@ void main() {
     });
 
     test('surfaces a stale-login failure and keeps the account', () async {
-      final repository = _FakeAuthRepository(account: _FakeAuthRepository.member)
-        ..deleteFailure = const AuthFailure(
-          code: 'requires-recent-login',
-          message: 'Recent login required.',
-        );
-      final bloc = AuthSessionBloc(repository: repository)..add(const AuthSessionStarted());
+      final repository =
+          _FakeAuthRepository(account: _FakeAuthRepository.member)
+            ..deleteFailure = const AuthFailure(
+              code: 'requires-recent-login',
+              message: 'Recent login required.',
+            );
+      final bloc = AuthSessionBloc(repository: repository)
+        ..add(const AuthSessionStarted());
       addTearDown(bloc.close);
       addTearDown(repository.dispose);
 
@@ -144,26 +166,29 @@ void main() {
       expect(bloc.state.isPending, isFalse);
     });
 
-    test('reports a degraded sign-out even when the provider stream is quiet', () async {
-      // A repository whose stream never reports null still ends the session,
-      // because the handler emits the signed-out state itself.
-      final repository = _FakeAuthRepository()..silentSignOut = true;
-      final bloc = AuthSessionBloc(repository: repository)..add(const AuthSessionStarted());
-      addTearDown(bloc.close);
-      addTearDown(repository.dispose);
+    test(
+      'reports a degraded sign-out even when the provider stream is quiet',
+      () async {
+        // A repository whose stream never reports null still ends the session,
+        // because the handler emits the signed-out state itself.
+        final repository = _FakeAuthRepository()..silentSignOut = true;
+        final bloc = AuthSessionBloc(repository: repository)
+          ..add(const AuthSessionStarted());
+        addTearDown(bloc.close);
+        addTearDown(repository.dispose);
 
-      await _waitFor(() => bloc.state is AuthSessionActive);
-      bloc.add(const AuthSessionSignOutRequested());
-      await _waitFor(() => bloc.state is AuthSessionSignedOut);
+        await _waitFor(() => bloc.state is AuthSessionActive);
+        bloc.add(const AuthSessionSignOutRequested());
+        await _waitFor(() => bloc.state is AuthSessionSignedOut);
 
-      expect(bloc.state.isSignedOut, isTrue);
-    });
+        expect(bloc.state.isSignedOut, isTrue);
+      },
+    );
   });
 }
 
 final class _FakeAuthRepository implements AuthRepository {
-  _FakeAuthRepository({AuthAccount? account})
-    : _account = account ?? guest {
+  _FakeAuthRepository({AuthAccount? account}) : _account = account ?? guest {
     _snapshots.add(_account);
   }
 

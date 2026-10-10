@@ -91,10 +91,7 @@ void main() {
       final semantics = tester.ensureSemantics();
       await tester.pumpWidget(
         animationHost(
-          const RollingDigits(
-            value: 7,
-            duration: Duration(milliseconds: 400),
-          ),
+          const RollingDigits(value: 7, duration: Duration(milliseconds: 400)),
         ),
       );
       await tester.pumpAndSettle();
@@ -102,10 +99,7 @@ void main() {
 
       await tester.pumpWidget(
         animationHost(
-          const RollingDigits(
-            value: 9,
-            duration: Duration(milliseconds: 400),
-          ),
+          const RollingDigits(value: 9, duration: Duration(milliseconds: 400)),
         ),
       );
       await tester.pumpAndSettle();

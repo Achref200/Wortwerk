@@ -46,25 +46,26 @@ void main() {
       expect(find.byType(FritzAvatar), findsWidgets);
     });
 
-    testWidgets('FritzMoodAvatar swaps expression without motion when reduced', (
-      tester,
-    ) async {
-      final controller = FritzController();
-      addTearDown(controller.dispose);
+    testWidgets(
+      'FritzMoodAvatar swaps expression without motion when reduced',
+      (tester) async {
+        final controller = FritzController();
+        addTearDown(controller.dispose);
 
-      await tester.pumpWidget(
-        animationHost(
-          FritzMoodAvatar(controller: controller),
-          reduceMotion: true,
-        ),
-      );
-      expect(find.byType(AnimatedSwitcher), findsNothing);
-      expect(find.byType(FritzAvatar), findsOneWidget);
+        await tester.pumpWidget(
+          animationHost(
+            FritzMoodAvatar(controller: controller),
+            reduceMotion: true,
+          ),
+        );
+        expect(find.byType(AnimatedSwitcher), findsNothing);
+        expect(find.byType(FritzAvatar), findsOneWidget);
 
-      controller.celebrate();
-      await tester.pumpAndSettle();
-      expect(find.byType(FritzAvatar), findsOneWidget);
-    });
+        controller.celebrate();
+        await tester.pumpAndSettle();
+        expect(find.byType(FritzAvatar), findsOneWidget);
+      },
+    );
   });
 
   group('FlameController', () {

@@ -4,18 +4,24 @@ import 'package:wortwerk/core/animations/confetti_burst.dart';
 
 import 'animation_test_host.dart';
 
-ConfettiPainter _painter(WidgetTester tester) => tester
-    .widget<CustomPaint>(
-      find
-          .descendant(
-            of: find.byType(ConfettiBurst),
-            matching: find.byType(CustomPaint),
-          )
-          .first,
-    )
-    .painter! as ConfettiPainter;
+ConfettiPainter _painter(WidgetTester tester) =>
+    tester
+            .widget<CustomPaint>(
+              find
+                  .descendant(
+                    of: find.byType(ConfettiBurst),
+                    matching: find.byType(CustomPaint),
+                  )
+                  .first,
+            )
+            .painter!
+        as ConfettiPainter;
 
-Widget _hosted({bool reduceMotion = false, VoidCallback? onCompleted, int count = 80}) {
+Widget _hosted({
+  bool reduceMotion = false,
+  VoidCallback? onCompleted,
+  int count = 80,
+}) {
   return animationHost(
     SizedBox(
       width: 300,

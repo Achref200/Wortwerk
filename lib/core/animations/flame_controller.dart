@@ -26,7 +26,8 @@ enum FlameState {
 /// [AnimatedStreakFlame] widget renders the result. Keeping this a plain
 /// notifier makes the choreography testable without a widget pump.
 final class FlameController extends ChangeNotifier {
-  FlameController({bool lit = false}) : _state = lit ? FlameState.lit : FlameState.dormant;
+  FlameController({bool lit = false})
+    : _state = lit ? FlameState.lit : FlameState.dormant;
 
   FlameState _state;
 

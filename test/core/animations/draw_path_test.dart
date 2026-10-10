@@ -11,7 +11,10 @@ Path _line() => Path()
 DrawPathPainter _painter(WidgetTester tester) {
   final paint = tester.widget<CustomPaint>(
     find
-        .descendant(of: find.byType(DrawPath), matching: find.byType(CustomPaint))
+        .descendant(
+          of: find.byType(DrawPath),
+          matching: find.byType(CustomPaint),
+        )
         .first,
   );
   return paint.painter! as DrawPathPainter;

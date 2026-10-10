@@ -90,7 +90,9 @@ final class _ShakeWidgetState extends State<ShakeWidget>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.autoShake && !_controller.isAnimating && _controller.value == 0) {
+    if (widget.autoShake &&
+        !_controller.isAnimating &&
+        _controller.value == 0) {
       _play();
     }
   }

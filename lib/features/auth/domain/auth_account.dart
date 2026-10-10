@@ -67,9 +67,11 @@ final class AuthFailure implements Exception {
     'user-not-found' ||
     'invalid-credential' ||
     'wrong-password' => AppFailureKind.unauthenticated,
-    'requires-recent-login' || 'user-mismatch' => AppFailureKind.permissionDenied,
-    'invalid-email' || 'weak-password' || 'missing-password' =>
-        AppFailureKind.validation,
+    'requires-recent-login' ||
+    'user-mismatch' => AppFailureKind.permissionDenied,
+    'invalid-email' ||
+    'weak-password' ||
+    'missing-password' => AppFailureKind.validation,
     'email-already-in-use' ||
     'credential-already-in-use' ||
     'account-exists-with-different-credential' => AppFailureKind.conflict,
@@ -108,8 +110,7 @@ final class AuthFailure implements Exception {
         'Zu viele Versuche. Bitte warte einen Moment und versuche es erneut.',
       'user-disabled' =>
         'Dieses Konto wurde deaktiviert. Bitte wende dich an den Support.',
-      'user-mismatch' =>
-        'Die Angaben geh\u00f6ren zu einem anderen Konto. Bitte pr\u00fcfe sie.',
+      'user-mismatch' => 'Die Angaben geh\u00f6ren zu einem anderen Konto. Bitte pr\u00fcfe sie.',
       'operation-not-allowed' || 'provider-error' =>
         'Diese Anmeldemethode ist gerade nicht verf\u00fcgbar. Bitte versuche eine '
             'andere Methode.',

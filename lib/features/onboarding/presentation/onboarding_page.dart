@@ -969,7 +969,9 @@ final class _OnboardingPageState extends State<OnboardingPage> {
                     ),
                     label: LocalizedText(
                       strings(
-                        controller.enabled ? WText.pushDisable : WText.pushEnable,
+                        controller.enabled
+                            ? WText.pushDisable
+                            : WText.pushEnable,
                       ),
                     ),
                   ),

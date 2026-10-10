@@ -85,7 +85,9 @@ void main() {
       expect(
         tester
             .widget<Transform>(
-              find.descendant(of: finder, matching: find.byType(Transform)).first,
+              find
+                  .descendant(of: finder, matching: find.byType(Transform))
+                  .first,
             )
             .transform
             .getTranslation()
@@ -98,7 +100,9 @@ void main() {
       expect(
         tester
             .widget<Transform>(
-              find.descendant(of: finder, matching: find.byType(Transform)).first,
+              find
+                  .descendant(of: finder, matching: find.byType(Transform))
+                  .first,
             )
             .transform
             .getTranslation()

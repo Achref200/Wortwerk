@@ -175,9 +175,7 @@ double _measureDigit(BuildContext context, TextStyle style) {
   final painter = TextPainter(
     text: TextSpan(
       text: '8',
-      style: style.copyWith(
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
+      style: style.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
     ),
     textDirection: TextDirection.ltr,
     textScaler: MediaQuery.textScalerOf(context),

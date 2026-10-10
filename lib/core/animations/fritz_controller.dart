@@ -59,11 +59,7 @@ final class FritzMoodAvatar extends StatelessWidget {
         }
         return AnimatedSwitcher(
           duration: motionDuration(context, FritzController.blendDuration),
-          child: _MoodAvatar(
-            key: ValueKey(mood),
-            mood: mood,
-            size: size,
-          ),
+          child: _MoodAvatar(key: ValueKey(mood), mood: mood, size: size),
         );
       },
     );
@@ -82,10 +78,7 @@ final class _MoodAvatar extends StatelessWidget {
       case FritzMood.idle:
         return AnimatedFritzAvatar(size: size);
       case FritzMood.thinking:
-        return Transform.rotate(
-          angle: -0.06,
-          child: FritzAvatar(size: size),
-        );
+        return Transform.rotate(angle: -0.06, child: FritzAvatar(size: size));
       case FritzMood.happy:
       case FritzMood.celebrate:
         final peak = mood == FritzMood.celebrate ? 1.16 : 1.1;

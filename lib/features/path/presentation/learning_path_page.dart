@@ -185,12 +185,10 @@ final class _LearningPathPageState extends State<LearningPathPage> {
                     ),
                     const SizedBox(height: 16),
                     _LevelUnlockProgressCard(
-                      fromLevel:
-                          path.startingLevelId ?? path.levels.first.id,
+                      fromLevel: path.startingLevelId ?? path.levels.first.id,
                       progress:
-                          path.progressByLevel[
-                            path.startingLevelId ?? path.levels.first.id
-                          ] ??
+                          path.progressByLevel[path.startingLevelId ??
+                              path.levels.first.id] ??
                           const LearningLevelProgress(),
                       unlockedLevels: path.unlockedLevels,
                     ),

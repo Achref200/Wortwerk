@@ -1116,9 +1116,8 @@ final class WortwerkStrings {
     'invalid-email' => this(WText.authFailureInvalidEmail),
     'weak-password' ||
     'missing-password' => this(WText.authFailureWeakPassword),
-    'requires-recent-login' || 'user-mismatch' => this(
-      WText.authFailureRecentLogin,
-    ),
+    'requires-recent-login' ||
+    'user-mismatch' => this(WText.authFailureRecentLogin),
     'too-many-requests' => this(WText.authFailureRateLimited),
     'user-disabled' => this(WText.authFailureDisabled),
     'invalid-credential' ||

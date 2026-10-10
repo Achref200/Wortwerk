@@ -8,9 +8,7 @@ void main() {
   group('PulseHalo', () {
     testWidgets('pulses the halo past its resting scale', (tester) async {
       await tester.pumpWidget(
-        animationHost(
-          const PulseHalo(child: SizedBox(width: 40, height: 40)),
-        ),
+        animationHost(const PulseHalo(child: SizedBox(width: 40, height: 40))),
       );
 
       await tester.pump(const Duration(milliseconds: 400));

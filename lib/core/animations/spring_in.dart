@@ -95,11 +95,8 @@ final class _SpringInState extends State<SpringIn>
         final t = widget.curve.transform(_springProgress);
         final scale = widget.beginScale + (1 - widget.beginScale) * t;
         final offset = widget.beginOffset * (1 - t);
-        final opacity =
-            (widget.beginOpacity + (1 - widget.beginOpacity) * t).clamp(
-              0.0,
-              1.0,
-            );
+        final opacity = (widget.beginOpacity + (1 - widget.beginOpacity) * t)
+            .clamp(0.0, 1.0);
         return Opacity(
           opacity: opacity,
           child: Transform.translate(
