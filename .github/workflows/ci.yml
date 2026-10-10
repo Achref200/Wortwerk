@@ -13,7 +13,8 @@ jobs:
   flutter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - if: matrix.shouldBuild
+        uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.47.2"
@@ -46,18 +47,16 @@ jobs:
 
   cloud-build:
     needs: flutter
-    if: >-
-      github.event_name == 'push' &&
-      ((github.ref == 'refs/heads/main' && matrix.flavor == 'staging') ||
-      (startsWith(github.ref, 'refs/tags/v') && matrix.flavor == 'production'))
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - flavor: staging
             variablePrefix: STAGING
+            shouldBuild: "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}"
           - flavor: production
             variablePrefix: PRODUCTION
+            shouldBuild: "${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}"
     env:
       FIREBASE_PROJECT_ID: ${{ vars[format('{0}_FIREBASE_PROJECT_ID', matrix.variablePrefix)] }}
       FIREBASE_API_KEY: ${{ vars[format('{0}_FIREBASE_API_KEY', matrix.variablePrefix)] }}
@@ -67,7 +66,8 @@ jobs:
       FIREBASE_WEB_APP_ID: ${{ vars[format('{0}_FIREBASE_WEB_APP_ID', matrix.variablePrefix)] }}
       FIREBASE_STORAGE_BUCKET: ${{ vars[format('{0}_FIREBASE_STORAGE_BUCKET', matrix.variablePrefix)] }}
     steps:
-      - uses: actions/checkout@v4
+      - if: matrix.shouldBuild
+        uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.47.2"
