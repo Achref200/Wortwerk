@@ -1,0 +1,385 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInAs(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validLevel(level, unitId) {
+      return (level == 'A1' && unitId == 'a1_greetings')
+        || (level == 'A2' && unitId == 'a2_travel')
+        || (level == 'B1' && unitId == 'b1_conversation');
+    }
+
+    function validGoals(goals) {
+      return goals is list && goals.size() <= 6;
+    }
+
+    function validNotificationPreferences(value) {
+      return value is map
+        && value.keys().hasOnly([
+          'learningReminder',
+          'groupMessages',
+          'weeklySummary'
+        ])
+        && value.keys().hasAll([
+          'learningReminder',
+          'groupMessages',
+          'weeklySummary'
+        ])
+        && value.learningReminder is bool
+        && value.groupMessages is bool
+        && value.weeklySummary is bool;
+    }
+
+    function validOptionalPreferences(data) {
+      return (!('displayName' in data)
+          || (data.displayName is string && data.displayName.size() <= 64))
+        && (!('dailyMinutes' in data)
+          || data.dailyMinutes in [5, 10, 15, 20])
+        && (!('restWeekday' in data)
+          || (data.restWeekday is int
+            && data.restWeekday >= 0
+            && data.restWeekday <= 6))
+        && (!('timezone' in data)
+          || (data.timezone is string && data.timezone.size() <= 64))
+        && (!('reminderTime' in data)
+          || (data.reminderTime is string
+            && data.reminderTime.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')))
+        && (!('adaptiveLevelEnabled' in data)
+          || data.adaptiveLevelEnabled is bool)
+        && (!('speechOutputEnabled' in data)
+          || data.speechOutputEnabled is bool)
+        && (!('notificationPreferences' in data)
+          || validNotificationPreferences(data.notificationPreferences));
+    }
+
+    function validPlacement(placement, level) {
+      return placement is map
+        && placement.keys().hasOnly(['done', 'level', 'confidence', 'source'])
+        && placement.keys().hasAll(['done', 'level', 'confidence', 'source'])
+        && placement.done is bool
+        && placement.level == level
+        && placement.confidence is number
+        && placement.confidence >= 0
+        && placement.confidence <= 1
+        && (placement.source == 'quiz' || placement.source == 'self_assessment')
+        && placement.done == (placement.source == 'quiz');
+    }
+
+    function matchesVerifiedPlacement(profile, placement, level, unitId) {
+      return !placement.done
+        || (
+          'verifiedPlacement' in profile
+          && profile.verifiedPlacement.level == level
+          && profile.verifiedPlacement.unitId == unitId
+          && profile.verifiedPlacement.confidence == placement.confidence
+        );
+    }
+
+    function validDraft(draft) {
+      return draft is map
+        && draft.keys().hasOnly([
+          'step',
+          'goals',
+          'dailyMinutes',
+          'selectedLevel',
+          'testStartingLevel',
+          'placementAnswers',
+          'placementLevel',
+          'placementConfidence'
+        ])
+        && draft.step is int
+        && draft.step >= 0
+        && draft.step <= 4
+        && validGoals(draft.goals)
+        && draft.dailyMinutes in [5, 10, 15, 20]
+        && draft.selectedLevel >= 0
+        && draft.selectedLevel <= 3
+        && draft.testStartingLevel >= 0
+        && draft.testStartingLevel <= 2
+        && draft.placementAnswers is list
+        && draft.placementAnswers.size() <= 8;
+    }
+
+    function validNewUser(uid) {
+      let data = request.resource.data;
+      return signedInAs(uid)
+        && data.keys().hasOnly([
+          'schemaVersion',
+          'displayName',
+          'uiLang',
+          'explainLang',
+          'level',
+          'unitId',
+          'goals',
+          'dailyMinutes',
+          'timezone',
+          'onboardingCompleted',
+          'xpTotal',
+          'xpWeek',
+          'streak',
+          'restWeekday',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasAll([
+          'schemaVersion',
+          'displayName',
+          'uiLang',
+          'explainLang',
+          'level',
+          'unitId',
+          'goals',
+          'dailyMinutes',
+          'timezone',
+          'onboardingCompleted',
+          'xpTotal',
+          'xpWeek',
+          'streak',
+          'restWeekday',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.schemaVersion == 1
+        && data.displayName is string
+        && data.displayName.size() <= 64
+        && data.uiLang in ['de', 'en', 'fr', 'ar']
+        && data.explainLang in ['de', 'en', 'fr', 'ar']
+        && validLevel(data.level, data.unitId)
+        && data.goals is list
+        && data.goals.size() <= 6
+        && data.dailyMinutes in [5, 10, 15, 20]
+        && data.timezone is string
+        && data.timezone.size() <= 64
+        && data.onboardingCompleted == false
+        && data.xpTotal == 0
+        && data.xpWeek == 0
+        && data.streak is map
+        && data.streak.keys().hasOnly([
+          'current',
+          'longest',
+          'shields',
+          'lastActiveDayId'
+        ])
+        && data.streak.current == 0
+        && data.streak.longest == 0
+        && data.streak.shields == 2
+        && data.streak.lastActiveDayId == null
+        && data.restWeekday is int
+        && data.restWeekday >= 0
+        && data.restWeekday <= 6
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
+    }
+
+    match /users/{uid} {
+      allow read: if signedInAs(uid);
+      allow create: if validNewUser(uid);
+      allow update: if signedInAs(uid)
+        && request.resource.data.schemaVersion == resource.data.schemaVersion
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && (
+          (
+            resource.data.onboardingCompleted == false
+            && request.resource.data.onboardingCompleted == false
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['onboardingDraft', 'updatedAt'])
+            && validDraft(request.resource.data.onboardingDraft)
+          )
+          || (
+            resource.data.onboardingCompleted == false
+            && request.resource.data.onboardingCompleted == true
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly([
+                'level',
+                'unitId',
+                'goals',
+                'dailyMinutes',
+                'placement',
+                'onboardingCompleted',
+                'onboardingDraft',
+                'updatedAt'
+              ])
+            && validLevel(request.resource.data.level, request.resource.data.unitId)
+            && validGoals(request.resource.data.goals)
+            && request.resource.data.goals.size() > 0
+            && request.resource.data.dailyMinutes in [5, 10, 15, 20]
+            && validPlacement(request.resource.data.placement, request.resource.data.level)
+            && matchesVerifiedPlacement(
+              resource.data,
+              request.resource.data.placement,
+              request.resource.data.level,
+              request.resource.data.unitId
+            )
+            && validDraft(request.resource.data.onboardingDraft)
+          )
+          || request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly([
+              'displayName',
+              'uiLang',
+              'explainLang',
+              'goals',
+              'dailyMinutes',
+              'timezone',
+              'reminderTime',
+              'restWeekday',
+              'adaptiveLevelEnabled',
+              'speechOutputEnabled',
+              'notificationPreferences',
+              'updatedAt',
+              'lastSeenAt',
+              'appVersion'
+            ])
+            && validOptionalPreferences(request.resource.data)
+        );
+
+      match /progress/{lessonId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+
+        // A completion request is the idempotency record for completeLesson.
+        // Admin SDK Functions write these records; clients may only inspect
+        // their own record after a retry.
+        match /requests/{requestId} {
+          allow read: if signedInAs(uid);
+          allow write: if false;
+        }
+      }
+
+      match /levelProgress/{levelId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /cards/{cardId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /days/{dayId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /missions/{dayId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /badges/{badgeId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /unlocks/{level} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      // Idempotency receipts and device registrations are server-owned.
+      match /reviewSessions/{requestId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /devices/{deviceId} {
+        allow read, write: if false;
+      }
+
+      match /notifications/{notificationId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /aiThreads/{threadId} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+
+        match /messages/{messageId} {
+          allow read: if signedInAs(uid);
+          allow write: if false;
+        }
+      }
+
+      match /blocks/{otherUid} {
+        allow read: if signedInAs(uid);
+        allow write: if false;
+      }
+
+      match /communityRateLimits/{requestId} {
+        allow read, write: if false;
+      }
+
+      match /communityRequests/{requestId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /groups/{groupId} {
+      function isMember() {
+        return request.auth != null
+          && exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+      }
+
+      allow read: if request.auth != null
+        && resource.data.published == true
+        && resource.data.isPublic == true;
+      allow write: if false;
+
+      match /members/{memberUid} {
+        allow read: if request.auth != null
+          && (request.auth.uid == memberUid
+            || exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)));
+        allow write: if false;
+      }
+
+      match /messages/{messageId} {
+        allow read: if isMember()
+          && resource.data.status == 'visible';
+        allow write: if false;
+      }
+    }
+
+    match /reports/{reportId} {
+      allow read, write: if false;
+    }
+
+    // Published curriculum is authored and published by trusted tooling only.
+    match /contentMeta/{documentId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /levels/{levelId} {
+      allow read: if request.auth != null && resource.data.published == true;
+      allow write: if false;
+
+      match /units/{unitId} {
+        allow read: if request.auth != null && resource.data.published == true;
+        allow write: if false;
+
+        match /lessons/{lessonId} {
+          allow read: if request.auth != null && resource.data.published == true;
+          allow write: if false;
+        }
+      }
+    }
+
+    match /decks/{deckId} {
+      allow read: if request.auth != null && resource.data.published == true;
+      allow write: if false;
+
+      match /cards/{cardId} {
+        allow read: if request.auth != null && resource.data.published == true;
+        allow write: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

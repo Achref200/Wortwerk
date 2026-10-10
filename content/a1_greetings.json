@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "levelId": "A1",
+  "unitId": "a1_greetings",
+  "lessonId": "a1_greetings",
+  "title": "A1 · Begrüßungen",
+  "order": 1,
+  "published": true,
+  "contentOrigin": "migrated-from-existing-app-content",
+  "questions": [
+    {
+      "id": "greeting_morning",
+      "prompt": "Du triffst jemanden am Morgen. Was sagst du?",
+      "explanation": "„Guten Morgen“ sagt man am Morgen.",
+      "correctChoiceId": "morning_guten_morgen",
+      "choices": [
+        { "id": "morning_guten_morgen", "text": "Guten Morgen" },
+        { "id": "morning_guten_abend", "text": "Guten Abend" },
+        { "id": "morning_gute_nacht", "text": "Gute Nacht" },
+        { "id": "morning_tschuess", "text": "Tschüss" }
+      ]
+    },
+    {
+      "id": "greeting_name",
+      "prompt": "Wie fragst du höflich nach dem Namen?",
+      "explanation": "„Wie heißen Sie?“ ist die höfliche Frage nach dem Namen.",
+      "correctChoiceId": "name_wie_heissen",
+      "choices": [
+        { "id": "name_wie_heissen", "text": "Wie heißen Sie?" },
+        { "id": "name_woher", "text": "Woher kommen Sie?" },
+        { "id": "name_wie_alt", "text": "Wie alt sind Sie?" },
+        { "id": "name_was_machen", "text": "Was machen Sie?" }
+      ]
+    },
+    {
+      "id": "greeting_introduce",
+      "prompt": "Ergänze die Vorstellung: „Ich ___ Mia.“",
+      "explanation": "Mit „Ich heiße …“ stellst du dich vor.",
+      "correctChoiceId": "introduce_heisse",
+      "choices": [
+        { "id": "introduce_heisse", "text": "heiße" },
+        { "id": "introduce_heisst", "text": "heißt" },
+        { "id": "introduce_heissen", "text": "heißen" },
+        { "id": "introduce_seid", "text": "seid" }
+      ]
+    },
+    {
+      "id": "greeting_thanks",
+      "prompt": "Jemand sagt „Danke“. Was antwortest du freundlich?",
+      "explanation": "Auf „Danke“ antwortet man oft mit „Bitte“.",
+      "correctChoiceId": "thanks_bitte",
+      "choices": [
+        { "id": "thanks_bitte", "text": "Bitte" },
+        { "id": "thanks_hallo", "text": "Hallo" },
+        { "id": "thanks_guten_tag", "text": "Guten Tag" },
+        { "id": "thanks_entschuldigung", "text": "Entschuldigung" }
+      ]
+    },
+    {
+      "id": "greeting_goodbye",
+      "prompt": "Du verabschiedest dich höflich. Was kannst du sagen?",
+      "explanation": "„Auf Wiedersehen“ ist eine höfliche Verabschiedung.",
+      "correctChoiceId": "goodbye_auf_wiedersehen",
+      "choices": [
+        { "id": "goodbye_auf_wiedersehen", "text": "Auf Wiedersehen" },
+        { "id": "goodbye_guten_morgen", "text": "Guten Morgen" },
+        { "id": "goodbye_danke", "text": "Danke" },
+        { "id": "goodbye_bitte", "text": "Bitte" }
+      ]
+    }
+  ]
+}

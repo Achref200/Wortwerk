@@ -1,0 +1,93 @@
+name: Wortwerk CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.2"
+          cache: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Install Flutter dependencies
+        run: flutter pub get
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
+      - name: Build Android dev flavor
+        run: flutter build apk --debug --flavor dev --dart-define=APP_FLAVOR=dev
+      - name: Install Functions dependencies
+        run: npm ci --prefix functions
+      - name: Build Functions
+        run: npm --prefix functions run build
+      - name: Verify Firebase emulators
+        run: npx --yes firebase-tools emulators:exec --project demo-wortwerk-dev --only auth,firestore,functions,storage "npm --prefix functions run test:emulator"
+
+  cloud-build:
+    needs: flutter
+    if: >-
+      github.event_name == 'push' &&
+      ((github.ref == 'refs/heads/main' && matrix.flavor == 'staging') ||
+      (startsWith(github.ref, 'refs/tags/v') && matrix.flavor == 'production'))
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - flavor: staging
+            variablePrefix: STAGING
+          - flavor: production
+            variablePrefix: PRODUCTION
+    env:
+      FIREBASE_PROJECT_ID: ${{ vars[format('{0}_FIREBASE_PROJECT_ID', matrix.variablePrefix)] }}
+      FIREBASE_API_KEY: ${{ vars[format('{0}_FIREBASE_API_KEY', matrix.variablePrefix)] }}
+      FIREBASE_SENDER_ID: ${{ vars[format('{0}_FIREBASE_SENDER_ID', matrix.variablePrefix)] }}
+      FIREBASE_ANDROID_APP_ID: ${{ vars[format('{0}_FIREBASE_ANDROID_APP_ID', matrix.variablePrefix)] }}
+      FIREBASE_IOS_APP_ID: ${{ vars[format('{0}_FIREBASE_IOS_APP_ID', matrix.variablePrefix)] }}
+      FIREBASE_WEB_APP_ID: ${{ vars[format('{0}_FIREBASE_WEB_APP_ID', matrix.variablePrefix)] }}
+      FIREBASE_STORAGE_BUCKET: ${{ vars[format('{0}_FIREBASE_STORAGE_BUCKET', matrix.variablePrefix)] }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.2"
+          cache: true
+      - name: Require Firebase app configuration
+        run: |
+          set -euo pipefail
+          for name in FIREBASE_PROJECT_ID FIREBASE_API_KEY FIREBASE_SENDER_ID FIREBASE_ANDROID_APP_ID FIREBASE_IOS_APP_ID FIREBASE_WEB_APP_ID FIREBASE_STORAGE_BUCKET; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error title=Missing Firebase configuration::$name must be configured as a repository variable."
+              exit 1
+            fi
+          done
+      - name: Build cloud Android bundle
+        run: >-
+          flutter build appbundle --release --flavor "${{ matrix.flavor }}"
+          --dart-define=APP_FLAVOR="${{ matrix.flavor }}"
+          --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID"
+          --dart-define=FIREBASE_API_KEY="$FIREBASE_API_KEY"
+          --dart-define=FIREBASE_SENDER_ID="$FIREBASE_SENDER_ID"
+          --dart-define=FIREBASE_ANDROID_APP_ID="$FIREBASE_ANDROID_APP_ID"
+          --dart-define=FIREBASE_IOS_APP_ID="$FIREBASE_IOS_APP_ID"
+          --dart-define=FIREBASE_WEB_APP_ID="$FIREBASE_WEB_APP_ID"
+          --dart-define=FIREBASE_STORAGE_BUCKET="$FIREBASE_STORAGE_BUCKET"

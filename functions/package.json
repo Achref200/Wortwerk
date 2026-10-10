@@ -1,0 +1,22 @@
+{
+  "name": "wortwerk-functions",
+  "private": true,
+  "engines": {
+    "node": "22"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "seed:content": "node scripts/seed-content.cjs",
+    "seed:community": "node scripts/seed-community.cjs",
+    "test:unit": "npm run build && node --test test/placement.test.cjs test/lesson.test.cjs test/review.test.cjs test/fritz.test.cjs test/progression.test.cjs test/missions.test.cjs test/notifications.test.cjs test/community.test.cjs",
+    "test:emulator": "node test/emulator-smoke.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0",
+    "firebase-functions": "^6.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
