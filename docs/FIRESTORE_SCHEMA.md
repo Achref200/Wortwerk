@@ -23,7 +23,7 @@ content documents.
 
 | Path | Owner and purpose | Current state |
 |---|---|---|
-| `users/{uid}` | Client creates the initial profile, saves validated onboarding choices and user-owned settings, and may edit the display name; trusted Functions update XP, streak, active level, and other server-owned progress. | Implemented; rules restrict profile edits to validated owner fields and protect progress fields. Profile settings currently include daily goal, reminder time, rest weekday, adaptive-level preference, speech output preference, and notification category preferences. |
+| `users/{uid}` | Client creates the initial profile, saves validated onboarding choices and user-owned settings, and may edit the display name; trusted Functions update XP, streak, active level, and other server-owned progress. | Implemented; rules restrict profile edits to validated owner fields and protect progress fields. Onboarding stores up to three goals, a learning style and feedback preference in `learningPreferences`, plus daily minutes, weekly target days, level source, and confidence in `learningPlan`. The weekly target is a habit goal; it does not change the actual streak counter. |
 | `users/{uid}/days/{yyyy-MM-dd}` | Functions aggregate activity by the learner's IANA timezone. | Implemented for XP, lesson completions/attempts, card reviews, and Fritz turns; one qualifying Fritz conversation adds 40 XP and activates that day; read by the streak summary. |
 | `users/{uid}/missions/{yyyy-MM-dd}` | Server-generated goal-focused daily missions and completion totals. | `getDailyMissions` initializes three mission records. First confirmed lesson completion, ten-card review, or six-turn Fritz conversation marks its matching task and awards 20/20/30 XP once. Owner read is permitted; client writes are denied. |
 | `users/{uid}/progress/{lessonId}` | Functions store lesson completion and best aggregate result. | Implemented for the single A1 greetings lesson. |
@@ -103,8 +103,14 @@ and replacement credentials are configured in Secret Manager.
 - `firestore.rules` is the client authorization boundary.
 - `firestore.indexes.json` declares the composite queries in `docs/SPEC.md`.
 - `firebase.json` binds both files for emulator and explicit deployments.
-- `content/a1_greetings.json` is the only current lesson source document; the
-  app and completion function both load the corresponding Firestore document.
+- `content/manifest.json` version 1 lists the current content source.
+- `content/a1_greetings.json` is the only published lesson source: one A1
+  greetings lesson with ten multiple-choice exercises. The app and completion
+  function load the corresponding published Firestore document.
+- `functions/scripts/content-validation.cjs` checks stable IDs, references,
+  exercise answers and required lesson metadata before any publish. The seed
+  supports `--dry-run`, deterministic paths, 450-write batches, unchanged
+  document skips, and repeated safe emulator runs.
 - Firestore's single-field indexes cover the current date range query; the
   declared composites support the planned due-card, feed, discovery, inbox, and
   report queries.

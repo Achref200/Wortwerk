@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="%LANG_ISO_CODE%">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>%WEB_TITLE%</title>
+
+    <!--
+      PWA. `web.output` is "single", so this file (served from `public/`, which
+      Expo copies to the root of the export verbatim) is the only place the head
+      tags can be added — `+html.tsx` is the static/server equivalent and does
+      not apply here.
+    -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#F4F1EA" />
+    <meta name="application-name" content="Fritz" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!--
+      Safari ignores the manifest's icons for Add to Home Screen and reads this
+      instead. Without it iOS uses a screenshot of the page as the icon.
+    -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <!-- Drops Safari's chrome so an installed Fritz opens like an app. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Fritz" />
+
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      /* Keeps <ScrollView> in charge of scrolling. */
+      body {
+        overflow: hidden;
+        background: #f4f1ea;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior: none;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+
+    <style>
+      /* Boot splash — removed once React has mounted into #root. */
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        background: #f4f1ea;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        transition: opacity 260ms ease;
+      }
+      #splash.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #splash img {
+        width: 88px;
+        height: 88px;
+        border-radius: 22px;
+      }
+      #splash .name {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #1e1d22;
+      }
+      #splash .tagline {
+        font-size: 13px;
+        color: #55525c;
+      }
+      #splash .spinner {
+        width: 22px;
+        height: 22px;
+        margin-top: 6px;
+        border-radius: 50%;
+        border: 2px solid #ddd8cc;
+        border-top-color: #e8590c;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      noscript {
+        display: block;
+        padding: 24px;
+        text-align: center;
+        color: #1e1d22;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript>Bitte JavaScript aktivieren, um Fritz zu öffnen.</noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+
+    <div id="splash" aria-hidden="true">
+      <img src="/icons/Icon-192.png" alt="Fritz" />
+      <div class="name">Fritz</div>
+      <div class="tagline">Wortwerk Native · Deutsch lernen</div>
+      <div class="spinner"></div>
+    </div>
+
+    <script>
+      (function () {
+        function hideSplash() {
+          var splash = document.getElementById('splash');
+          if (!splash) return;
+          splash.classList.add('hidden');
+          setTimeout(function () {
+            splash.remove();
+          }, 420);
+        }
+
+        // React mounts into #root — hide the splash as soon as it renders.
+        var root = document.getElementById('root');
+        var observer = new MutationObserver(function () {
+          if (root && root.childElementCount > 0) {
+            observer.disconnect();
+            hideSplash();
+          }
+        });
+        if (root) observer.observe(root, { childList: true, subtree: true });
+        setTimeout(hideSplash, 15000); // safety net
+
+        // Installable PWA: a small service worker keeps the shell available
+        // offline and lets browsers offer "Install app" / "Add to Home Screen".
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function (error) {
+              console.warn('Service worker registration failed:', error);
+            });
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

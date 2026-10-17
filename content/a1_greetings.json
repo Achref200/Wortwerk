@@ -4,14 +4,34 @@
   "unitId": "a1_greetings",
   "lessonId": "a1_greetings",
   "title": "A1 · Begrüßungen",
+  "description": "Lerne, freundlich Hallo zu sagen, dich vorzustellen und dich höflich zu verabschieden.",
   "order": 1,
   "published": true,
+  "publicationStatus": "published",
+  "contentVersion": 1,
+  "estimatedMinutes": 8,
+  "xpReward": 20,
+  "learningObjectives": [
+    "Tageszeitgerechte Begrüßungen verstehen und verwenden.",
+    "Nach dem Namen fragen und den eigenen Namen nennen.",
+    "Sich höflich bedanken und verabschieden."
+  ],
+  "vocabularyTags": ["Begrüßung", "Vorstellung", "Höflichkeit", "Abschied"],
+  "grammarTags": ["Verb heißen im Präsens", "Höfliche Anrede Sie"],
+  "prerequisites": [],
+  "unitTitle": "Erste Begegnungen",
+  "unitOrder": 1,
   "contentOrigin": "migrated-from-existing-app-content",
   "questions": [
     {
       "id": "greeting_morning",
+      "type": "multiple_choice",
+      "instruction": "Wähle die passende Begrüßung.",
+      "difficulty": "A1",
       "prompt": "Du triffst jemanden am Morgen. Was sagst du?",
       "explanation": "„Guten Morgen“ sagt man am Morgen.",
+      "vocabularyTags": ["Tageszeiten", "Begrüßung"],
+      "grammarTags": [],
       "correctChoiceId": "morning_guten_morgen",
       "choices": [
         { "id": "morning_guten_morgen", "text": "Guten Morgen" },
@@ -22,8 +42,13 @@
     },
     {
       "id": "greeting_name",
+      "type": "multiple_choice",
+      "instruction": "Wähle die höfliche Frage.",
+      "difficulty": "A1",
       "prompt": "Wie fragst du höflich nach dem Namen?",
       "explanation": "„Wie heißen Sie?“ ist die höfliche Frage nach dem Namen.",
+      "vocabularyTags": ["Vorstellung"],
+      "grammarTags": ["Höfliche Anrede Sie", "heißen"],
       "correctChoiceId": "name_wie_heissen",
       "choices": [
         { "id": "name_wie_heissen", "text": "Wie heißen Sie?" },
@@ -34,8 +59,13 @@
     },
     {
       "id": "greeting_introduce",
+      "type": "multiple_choice",
+      "instruction": "Vervollständige den Satz.",
+      "difficulty": "A1",
       "prompt": "Ergänze die Vorstellung: „Ich ___ Mia.“",
       "explanation": "Mit „Ich heiße …“ stellst du dich vor.",
+      "vocabularyTags": ["Vorstellung"],
+      "grammarTags": ["heißen im Präsens", "Verbkonjugation"],
       "correctChoiceId": "introduce_heisse",
       "choices": [
         { "id": "introduce_heisse", "text": "heiße" },
@@ -46,8 +76,13 @@
     },
     {
       "id": "greeting_thanks",
+      "type": "multiple_choice",
+      "instruction": "Wähle die freundliche Antwort.",
+      "difficulty": "A1",
       "prompt": "Jemand sagt „Danke“. Was antwortest du freundlich?",
       "explanation": "Auf „Danke“ antwortet man oft mit „Bitte“.",
+      "vocabularyTags": ["Höflichkeit"],
+      "grammarTags": [],
       "correctChoiceId": "thanks_bitte",
       "choices": [
         { "id": "thanks_bitte", "text": "Bitte" },
@@ -58,14 +93,104 @@
     },
     {
       "id": "greeting_goodbye",
+      "type": "multiple_choice",
+      "instruction": "Wähle die höfliche Verabschiedung.",
+      "difficulty": "A1",
       "prompt": "Du verabschiedest dich höflich. Was kannst du sagen?",
       "explanation": "„Auf Wiedersehen“ ist eine höfliche Verabschiedung.",
+      "vocabularyTags": ["Abschied", "Höflichkeit"],
+      "grammarTags": [],
       "correctChoiceId": "goodbye_auf_wiedersehen",
       "choices": [
         { "id": "goodbye_auf_wiedersehen", "text": "Auf Wiedersehen" },
         { "id": "goodbye_guten_morgen", "text": "Guten Morgen" },
         { "id": "goodbye_danke", "text": "Danke" },
         { "id": "goodbye_bitte", "text": "Bitte" }
+      ]
+    },
+    {
+      "id": "greeting_afternoon",
+      "type": "multiple_choice",
+      "instruction": "Achte auf die Tageszeit.",
+      "difficulty": "A1",
+      "prompt": "Du triffst eine Kollegin am Nachmittag. Was sagst du?",
+      "explanation": "„Guten Tag“ passt tagsüber und ist auch im beruflichen Umfeld höflich.",
+      "vocabularyTags": ["Tageszeiten", "Begrüßung", "Arbeit"],
+      "grammarTags": [],
+      "correctChoiceId": "afternoon_guten_tag",
+      "choices": [
+        { "id": "afternoon_guten_tag", "text": "Guten Tag" },
+        { "id": "afternoon_gute_nacht", "text": "Gute Nacht" },
+        { "id": "afternoon_guten_morgen", "text": "Guten Morgen" },
+        { "id": "afternoon_auf_wiedersehen", "text": "Auf Wiedersehen" }
+      ]
+    },
+    {
+      "id": "greeting_evening",
+      "type": "multiple_choice",
+      "instruction": "Wähle den Gruß für den Abend.",
+      "difficulty": "A1",
+      "prompt": "Du kommst am Abend bei Freunden an. Wie begrüßt du sie?",
+      "explanation": "„Guten Abend“ ist die Begrüßung am Abend. „Gute Nacht“ sagt man meist beim Schlafengehen.",
+      "vocabularyTags": ["Tageszeiten", "Begrüßung"],
+      "grammarTags": [],
+      "correctChoiceId": "evening_guten_abend",
+      "choices": [
+        { "id": "evening_guten_abend", "text": "Guten Abend" },
+        { "id": "evening_gute_nacht", "text": "Gute Nacht" },
+        { "id": "evening_guten_morgen", "text": "Guten Morgen" },
+        { "id": "evening_guten_tag", "text": "Guten Tag" }
+      ]
+    },
+    {
+      "id": "greeting_informal",
+      "type": "multiple_choice",
+      "instruction": "Wähle einen lockeren Gruß unter Freunden.",
+      "difficulty": "A1",
+      "prompt": "Du siehst einen guten Freund. Was kannst du sagen?",
+      "explanation": "„Hallo“ ist eine freundliche, informelle Begrüßung.",
+      "vocabularyTags": ["Informelle Begrüßung"],
+      "grammarTags": [],
+      "correctChoiceId": "informal_hallo",
+      "choices": [
+        { "id": "informal_hallo", "text": "Hallo!" },
+        { "id": "informal_auf_wiedersehen", "text": "Auf Wiedersehen!" },
+        { "id": "informal_gute_nacht", "text": "Gute Nacht!" },
+        { "id": "informal_danke", "text": "Danke!" }
+      ]
+    },
+    {
+      "id": "greeting_informal_goodbye",
+      "type": "multiple_choice",
+      "instruction": "Wähle die passende Verabschiedung.",
+      "difficulty": "A1",
+      "prompt": "Du gehst nach einem Treffen mit Freunden nach Hause. Was sagst du?",
+      "explanation": "„Tschüss“ ist eine übliche informelle Verabschiedung.",
+      "vocabularyTags": ["Informeller Abschied"],
+      "grammarTags": [],
+      "correctChoiceId": "informal_tschuess",
+      "choices": [
+        { "id": "informal_tschuess", "text": "Tschüss!" },
+        { "id": "informal_guten_morgen", "text": "Guten Morgen!" },
+        { "id": "informal_bitte", "text": "Bitte!" },
+        { "id": "informal_guten_abend", "text": "Guten Abend!" }
+      ]
+    },
+    {
+      "id": "greeting_how_are_you",
+      "type": "multiple_choice",
+      "instruction": "Finde eine natürliche Antwort.",
+      "difficulty": "A1",
+      "prompt": "Dein Freund fragt: „Wie geht es dir?“ Wie kannst du antworten?",
+      "explanation": "„Gut, danke. Und dir?“ ist eine natürliche Antwort und gibt die Frage zurück.",
+      "vocabularyTags": ["Nach dem Befinden fragen", "Gespräch"],
+      "grammarTags": ["Personalpronomen dir"],
+      "correctChoiceId": "feeling_gut_danke_und_dir",
+      "choices": [
+        { "id": "feeling_gut_danke_und_dir", "text": "Gut, danke. Und dir?" },
+        { "id": "feeling_ich_heisse", "text": "Ich heiße Mia." },
+        { "id": "feeling_guten_morgen", "text": "Guten Morgen." },
+        { "id": "feeling_auf_wiedersehen", "text": "Auf Wiedersehen." }
       ]
     }
   ]

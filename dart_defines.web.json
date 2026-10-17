@@ -1,0 +1,12 @@
+{
+  "_comment": "Build-time defines for the Wortwerk WEB build: flutter build web --release --dart-define-from-file=dart_defines.web.json . These are Firebase client identifiers, which are public by design (they ship in every web bundle); access is enforced by Firestore/Storage rules. Never put admin credentials or service-account keys here.",
+  "APP_FLAVOR": "production",
+  "USE_FIREBASE_EMULATORS": "false",
+  "FIREBASE_PROJECT_ID": "wortwerk-35912",
+  "FIREBASE_API_KEY": "AIzaSyDiv_5W4k27ckNn6_iTOJSF7YILPhkneYM",
+  "FIREBASE_SENDER_ID": "199818141354",
+  "FIREBASE_ANDROID_APP_ID": "1:199818141354:android:7225dc80bc6da1ec65bad3",
+  "FIREBASE_IOS_APP_ID": "1:199818141354:ios:e17e8a35515eab8d65bad3",
+  "FIREBASE_WEB_APP_ID": "1:199818141354:web:1a45b30e7e507ccd65bad3",
+  "FIREBASE_STORAGE_BUCKET": "wortwerk-35912.firebasestorage.app"
+}

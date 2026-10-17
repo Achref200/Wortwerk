@@ -84,6 +84,19 @@ final class FirestoreOnboardingProgressRepository
         'confidence': placement?.confidence ?? 0,
         'source': placement == null ? 'self_assessment' : 'quiz',
       },
+      // The shared Firestore rules require both maps when onboarding flips to
+      // true (the React Native app collects them explicitly). This app only
+      // asks for level, goals and rhythm, so write the documented defaults.
+      'learningPreferences': const {
+        'style': 'variety',
+        'feedback': 'gentle',
+      },
+      'learningPlan': {
+        'targetDaysPerWeek': 5,
+        'dailyMinutes': draft.dailyMinutes,
+        'levelSource': placement == null ? 'self_assessment' : 'quiz',
+        'confidence': placement?.confidence ?? 0,
+      },
       'onboardingCompleted': true,
       'onboardingDraft': draft.toJson(),
       'updatedAt': FieldValue.serverTimestamp(),

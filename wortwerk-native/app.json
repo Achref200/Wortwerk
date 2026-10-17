@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Wortwerk Native",
+    "slug": "wortwerk-native",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "wortwerk-native",
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "root": "./src/app"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F4F7F3",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 176,
+          "resizeMode": "contain"
+        }
+      ]
+    ],
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "de.wortwerk.nativecompare"
+    },
+    "android": {
+      "package": "de.wortwerk.nativecompare",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "lang": "de",
+      "themeColor": "#F4F1EA",
+      "description": "Wortwerk als React-Native-(Expo-)Web-App: tägliches Deutschtraining mit Fritz — zum Vergleich mit dem Flutter-Build.",
+      "favicon": "./public/icons/favicon.png",
+      "output": "single"
+    }
+  }
+}

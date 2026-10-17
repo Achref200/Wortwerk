@@ -649,13 +649,11 @@ const missionDocument = firestore
   .doc(`users/${authData.localId}/missions/${missionDayId}`);
 assert.equal((await missionDocument.get()).get("completedCount"), 0);
 
-const lessonAnswers = [
-  { questionId: "greeting_morning", choiceId: "morning_guten_morgen" },
-  { questionId: "greeting_name", choiceId: "name_wie_heissen" },
-  { questionId: "greeting_introduce", choiceId: "introduce_heisse" },
-  { questionId: "greeting_thanks", choiceId: "thanks_bitte" },
-  { questionId: "greeting_goodbye", choiceId: "goodbye_auf_wiedersehen" },
-];
+const lessonAnswers = curriculum.questions.map((question) => ({
+  questionId: question.id,
+  choiceId: question.correctChoiceId,
+}));
+const lessonXp = 10 + lessonAnswers.length * 2;
 const firstLessonRequestId = randomUUID();
 async function completeLesson(clientRequestId) {
   return fetch(
@@ -685,8 +683,8 @@ assert.deepEqual(await firstLessonResponse.json(), {
   result: {
     lessonId: "a1_greetings",
     accuracy: 1,
-    correctCount: 5,
-    xpAwarded: 20,
+    correctCount: lessonAnswers.length,
+    xpAwarded: lessonXp,
   },
 });
 assert.equal(
@@ -705,8 +703,8 @@ assert.deepEqual(await duplicateLessonResponse.json(), {
   result: {
     lessonId: "a1_greetings",
     accuracy: 1,
-    correctCount: 5,
-    xpAwarded: 20,
+    correctCount: lessonAnswers.length,
+    xpAwarded: lessonXp,
   },
 });
 
@@ -778,7 +776,7 @@ const updatedProfileResponse = await fetch(
 );
 assert.equal(updatedProfileResponse.status, 200);
 const updatedProfile = await updatedProfileResponse.json();
-assert.equal(updatedProfile.fields.xpTotal.integerValue, "70");
+assert.equal(updatedProfile.fields.xpTotal.integerValue, "80");
 assert.equal(updatedProfile.fields.streak.mapValue.fields.current.integerValue, "1");
 const activeDayId =
   updatedProfile.fields.streak.mapValue.fields.lastActiveDayId.stringValue;
@@ -808,7 +806,7 @@ const progressRead = await fetch(
 assert.equal(progressRead.status, 200, "Learners should read saved lesson progress.");
 assert.equal(
   (await progressRead.json()).fields.xpAwardedTotal.integerValue,
-  "20",
+  String(lessonXp),
   "Duplicate requests and lesson retries must not over-award XP.",
 );
 

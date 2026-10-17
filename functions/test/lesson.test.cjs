@@ -21,28 +21,10 @@ const {
   scoreLessonSubmission,
 } = require("../lib/lesson.js");
 
-const correctAnswers = [
-  {
-    questionId: "greeting_morning",
-    choiceId: "morning_guten_morgen",
-  },
-  {
-    questionId: "greeting_name",
-    choiceId: "name_wie_heissen",
-  },
-  {
-    questionId: "greeting_introduce",
-    choiceId: "introduce_heisse",
-  },
-  {
-    questionId: "greeting_thanks",
-    choiceId: "thanks_bitte",
-  },
-  {
-    questionId: "greeting_goodbye",
-    choiceId: "goodbye_auf_wiedersehen",
-  },
-];
+const correctAnswers = curriculum.questions.map((question) => ({
+  questionId: question.id,
+  choiceId: question.correctChoiceId,
+}));
 
 test("starts a streak on the first completed learning day", () => {
   assert.deepEqual(
@@ -143,12 +125,12 @@ function submission(answers = correctAnswers, extra = {}) {
   };
 }
 
-test("scores all five correct answers on the server", () => {
+test("scores all authored lesson answers on the server", () => {
   assert.deepEqual(scoreLessonSubmission(submission(), lessonDefinition), {
     lessonId: "a1_greetings",
     accuracy: 1,
-    correctCount: 5,
-    xpAwarded: 20,
+    correctCount: correctAnswers.length,
+    xpAwarded: 10 + correctAnswers.length * 2,
   });
 });
 
@@ -191,13 +173,13 @@ test("recomputes accuracy and XP from selected choice IDs", () => {
   );
   assert.deepEqual(scoreLessonSubmission(submission(answers), lessonDefinition), {
     lessonId: "a1_greetings",
-    accuracy: 0.8,
-    correctCount: 4,
-    xpAwarded: 18,
+    accuracy: (correctAnswers.length - 1) / correctAnswers.length,
+    correctCount: correctAnswers.length - 1,
+    xpAwarded: 10 + (correctAnswers.length - 1) * 2,
   });
 });
 
-test("accepts answers in any order and requires all five distinct questions", () => {
+test("accepts answers in any order and requires all authored questions", () => {
   assert.equal(
     scoreLessonSubmission(submission([...correctAnswers].reverse()), lessonDefinition).accuracy,
     1,
@@ -215,7 +197,7 @@ test("accepts answers in any order and requires all five distinct questions", ()
         ]),
         lessonDefinition,
       ),
-    /answered twice/,
+    /must answer each question exactly once/,
   );
 });
 

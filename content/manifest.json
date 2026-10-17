@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": 1,
+  "sources": [
+    "a1_greetings.json"
+  ],
+  "coreVocabularyCardIds": {
+    "A1": [
+      "greeting_hello",
+      "greeting_good_morning",
+      "greeting_good_day",
+      "greeting_good_evening",
+      "greeting_bye",
+      "greeting_goodbye_formal",
+      "greeting_thanks",
+      "greeting_please",
+      "greeting_name",
+      "greeting_introduce"
+    ]
+  }
+}

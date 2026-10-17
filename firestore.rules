@@ -33,6 +33,26 @@ service cloud.firestore {
         && value.weeklySummary is bool;
     }
 
+    function validLearningPreferences(value) {
+      return value is map
+        && value.keys().hasOnly(['style', 'feedback'])
+        && value.keys().hasAll(['style', 'feedback'])
+        && value.style in ['structured', 'conversation', 'visual', 'variety']
+        && value.feedback in ['gentle', 'direct'];
+    }
+
+    function validLearningPlan(value) {
+      return value is map
+        && value.keys().hasOnly(['targetDaysPerWeek', 'dailyMinutes', 'levelSource', 'confidence'])
+        && value.keys().hasAll(['targetDaysPerWeek', 'dailyMinutes', 'levelSource', 'confidence'])
+        && value.targetDaysPerWeek in [3, 5, 7]
+        && value.dailyMinutes in [5, 10, 15, 20]
+        && value.levelSource in ['quiz', 'self_assessment']
+        && value.confidence is number
+        && value.confidence >= 0
+        && value.confidence <= 1;
+    }
+
     function validOptionalPreferences(data) {
       return (!('displayName' in data)
           || (data.displayName is string && data.displayName.size() <= 64))
@@ -52,7 +72,11 @@ service cloud.firestore {
         && (!('speechOutputEnabled' in data)
           || data.speechOutputEnabled is bool)
         && (!('notificationPreferences' in data)
-          || validNotificationPreferences(data.notificationPreferences));
+          || validNotificationPreferences(data.notificationPreferences))
+        && (!('learningPreferences' in data)
+          || validLearningPreferences(data.learningPreferences))
+        && (!('learningPlan' in data)
+          || validLearningPlan(data.learningPlan));
     }
 
     function validPlacement(placement, level) {
@@ -88,11 +112,14 @@ service cloud.firestore {
           'testStartingLevel',
           'placementAnswers',
           'placementLevel',
-          'placementConfidence'
+          'placementConfidence',
+          'targetDaysPerWeek',
+          'learningStyle',
+          'feedbackStyle'
         ])
         && draft.step is int
         && draft.step >= 0
-        && draft.step <= 4
+        && draft.step <= 6
         && validGoals(draft.goals)
         && draft.dailyMinutes in [5, 10, 15, 20]
         && draft.selectedLevel >= 0
@@ -100,7 +127,10 @@ service cloud.firestore {
         && draft.testStartingLevel >= 0
         && draft.testStartingLevel <= 2
         && draft.placementAnswers is list
-        && draft.placementAnswers.size() <= 8;
+        && draft.placementAnswers.size() <= 8
+        && (!('targetDaysPerWeek' in draft) || draft.targetDaysPerWeek in [3, 5, 7])
+        && (!('learningStyle' in draft) || draft.learningStyle in ['structured', 'conversation', 'visual', 'variety'])
+        && (!('feedbackStyle' in draft) || draft.feedbackStyle in ['gentle', 'direct']);
     }
 
     function validNewUser(uid) {
@@ -198,6 +228,8 @@ service cloud.firestore {
                 'unitId',
                 'goals',
                 'dailyMinutes',
+                'learningPreferences',
+                'learningPlan',
                 'placement',
                 'onboardingCompleted',
                 'onboardingDraft',
@@ -207,6 +239,8 @@ service cloud.firestore {
             && validGoals(request.resource.data.goals)
             && request.resource.data.goals.size() > 0
             && request.resource.data.dailyMinutes in [5, 10, 15, 20]
+            && validLearningPreferences(request.resource.data.learningPreferences)
+            && validLearningPlan(request.resource.data.learningPlan)
             && validPlacement(request.resource.data.placement, request.resource.data.level)
             && matchesVerifiedPlacement(
               resource.data,
@@ -223,6 +257,8 @@ service cloud.firestore {
               'explainLang',
               'goals',
               'dailyMinutes',
+              'learningPreferences',
+              'learningPlan',
               'timezone',
               'reminderTime',
               'restWeekday',
